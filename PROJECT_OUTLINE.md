@@ -2,31 +2,52 @@
 
 ## Front-end (mobile first)
 
-### Splash/Entry Page (Nature Theme / Nesting)
+### Navigation Bar (Material UI at bottom (footer nav))
+
+### Splash/Entry/Loading Page (Nature Theme / Nesting)
     * Graphic / Branding
+    * Dual Nature Theme, Spring/Summer, Egg (?)
+    * Fitness For **EVERYONE** (?)
     * 2-5 Seconds or Click to Enter?
 ---
 
-### Login or Sign Up and Create Profile (Toggle?)
-    * Dual Nature Theme, Spring/Summer, Egg (?)
-    * Fitness For **EVERYONE** (?)
+### Login or Sign Up Then Create Profile (Choice Toggle)
+### Login (sub page)
+### Signup (sub page)
+    
 ---
-
-### Chat
+### Chat (MAIN PAGE)
     * List of Active Chats (and History)
     * Open A Chat from the List
+
+### View Matches
+    * Table of Cards: Matches (Scrolling)
+        - Visible **TAGS**
+            - sport/activity
+            - availability time blocks
+        - Chat Button
+
+        - Button to Save To Nest // TODO - (Stretch Goal)
+        - Button to Remove a Match // TODO - (Stretch Goal)
+        - location tag (necessary?) // TODO - (Stretch Goal)
 ---
 
-### FitNest Matches
-    * Cards of Matches (Scrolling)
-        - Visible **TAGS** (activities)
-        - Button to Save To Nest/Send **CHIRPS**
-        - Button to Eliminate
 ---
 
-### Manage 
+### User Manage 
     - Update Profile (or Delete)
     - Logout
+
+### Admin Manage 
+    - View All User Profiles
+    - Edit All User Profiles
+    - Delete User (Move to Archive)
+
+    // *TODO Stretch Goals 
+    - Suspend User (Stretch Goal)
+    - Contact User Form (Stretch Goal)
+    - Rest Authorization Token (Stretch Goal)
+
 
 <><><><><><><><><><><><><><>
 ## Back-end
@@ -46,7 +67,7 @@
 
 * Activity (PRIMARY MATCH CRITERION) // *TODO - Stretch Goal (top SINGLE Activity to Start) - Array of Other Activities?
 
-*!Note **Visible Tags:**
+*! Note **Visible Tags:**
 * Self Skill Level (Beginner, Intermediate, Expert, Instructor)
 * Seeking Skill Level
 * Age Range
@@ -84,5 +105,4 @@
 * Disconnect Location? // *!TODO - Stretch Goal
 * Turn off Notifications? // *! Operating System Option
 
-##### Kelsey test 2 hehe
-##### Jake test 4
+---
