@@ -57,7 +57,7 @@
 * Username !*
      (*TODO - or Google Account Sign in, Facebook Sign in)
 * Password !*
-* Location (Zip Code) !*
+* Location (Zip Code - {AS A STRING}) !*
 
 * First Name (Internal)
 * Last Name (Internal)
