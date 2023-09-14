@@ -106,4 +106,3 @@
 * Turn off Notifications? // *! Operating System Option
 
 ---
-SinGer Update from Develop
