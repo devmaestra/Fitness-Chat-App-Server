@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 4001;
 const cors = require('cors');
 
 const user = require ('./controllers/user.controller');
-
+const conversation = require('./controllers/conversation.controller') //added
 
 
 // MIDDLEWARE
@@ -22,7 +22,7 @@ app.use(cors());
 // ROUTES
 
 app.use('/user', user);
-
+app.use('/conversation', conversation) //added
 
 
 
