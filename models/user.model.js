@@ -36,6 +36,9 @@ const UserSchema = new mongoose.Schema({
     },
     userImage : {
         type: String // or and Array of Strings pointing to URLs
+    },
+    friends : {
+        type: [String] //! array of ObjectId or username of all conversations?
     }
 });
 
