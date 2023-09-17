@@ -6,9 +6,7 @@ const app = express();
 const PORT = process.env.PORT || 4001;
 const cors = require('cors');
 
-
-
-
+const user = require ('./controllers/user.controller');
 
 
 
@@ -23,6 +21,7 @@ app.use(cors());
 
 // ROUTES
 
+app.use('/user', user);
 
 
 
@@ -30,6 +29,7 @@ app.use(cors());
 
 
 
+// CONNECTION
 
 
 app.listen(PORT, () => log(`Chat server is running on Port: ${PORT}`));

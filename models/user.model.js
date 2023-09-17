@@ -22,11 +22,11 @@ const UserSchema = new mongoose.Schema({
 
     firstName: {        // internally collected only
         type: String,
-        required: true,
+        required: false,
     },
     lastName: {        // internally collected only
         type: String,
-        required: true,
+        required: false,
     },
     bioTagline: {
         type: String,
