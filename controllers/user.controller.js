@@ -12,12 +12,12 @@ router.post('/signup', async (req, res) => {
             username: req.body.username,
             email: req.body.email,
             password: bcrypt.hashSync(req.body.password, 13),
-            // locationZip: 
-            // firstName: 
-            // lastName:
-            // bioTagline:
-            // bioParagraph:
-            // userImage: 
+            locationZip: req.body.locationZip,
+            firstName: req.body.firstName,
+            lastName: req.body.lastName,
+            bioTagline: req.body.bioTagline,
+            bioParagraph: req.body.bioParagraph,
+            userImage: req.body.userImage
         });
 
         const newUser = await user.save();
