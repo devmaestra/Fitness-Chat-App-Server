@@ -64,6 +64,7 @@
 * Picture(s) (Default Graphic Sport? Face? Birds?)
 * Tagline
 * Biography (paragraph)
+* Gender
 
 * Activity (PRIMARY MATCH CRITERION) // *TODO - Stretch Goal (top SINGLE Activity to Start) - Array of Other Activities?
 
@@ -83,8 +84,10 @@
     - Age Group // *TODO - Add to Search Logic
     - Skill Levels // *TODO - Add to Search Logic
     - Availability (Time) // *TODO - Add to Search Logic
+    - Target Gender(s)  "Prefer to work with..." // *TODO - Add to Search Logic
+
 ---
-* CREATE Profile (Post) 
+* CREATE Profile (Post) // COMPLETE
 * READ (Get All Users by Location, Activity) 
 * UPDATE Profile (Patch) 
 * DELETE Profile (Delete)
