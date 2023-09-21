@@ -35,11 +35,16 @@ const UserSchema = new mongoose.Schema({
         type: String
     },
     userImage : {
-        type: String // or and Array of Strings pointing to URLs
+        type: String //! or and Array of Strings pointing to URLs
     },
     friends : {
         type: [String] //! array of ObjectId or username of all conversations?
+    },
+    active : {
+        type: Boolean,
+        required: true
     }
+    
 });
 
 module.exports = mongoose.model('User', UserSchema);
