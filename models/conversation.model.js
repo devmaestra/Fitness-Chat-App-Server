@@ -11,14 +11,18 @@ const ConversationSchema = new mongoose.Schema({
         type: String,
         required: false, 
     },
-    messages: {
-        type: Array,
-        
-    },
+    messages: [{ 
+        _id: String, 
+        text: String, 
+        date: Date }],
 
     owner_id: {
-        type: String,
+        type: mongoose.Types.ObjectId,
+        ref: 'User', // Refers to 'User' collection for referencing the room Owner
     },
+    ownerName: {
+        type: String
+    }
 
 });
 
@@ -30,15 +34,12 @@ module.exports = mongoose.model('Conversation', ConversationSchema);
 // const mongoose = require('mongoose');
 
 // const ConversationSchema = new mongoose.Schema({
-//     user01: {
-//         type: String, //! ObjectId, ref: User ?
-//         required: true,
-//     },
-//     user02: {
+    
+//     senderID: {
 //         type: String,  //! ObjectId, ref: User ?
 //         required: true,
 //     },
-//     senderID: {
+//     user02: {
 //         type: String,  //! ObjectId, ref: User ?
 //         required: true,
 //     },
@@ -46,7 +47,7 @@ module.exports = mongoose.model('Conversation', ConversationSchema);
 //         user: mongoose.Types.ObjectId,
 //         ref: 'User'
 //     }
-// ],
+//     ],
 //     messages: [
 //         { 
 //             _id: String, 

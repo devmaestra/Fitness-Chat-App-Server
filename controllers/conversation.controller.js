@@ -15,17 +15,17 @@ const errorResponse = (res, error) => {
     )
 }
 
-//TODO POST - create
+//TODO POST - create Conversation
 router.post('/', validateSession, async (req, res) => {
     try {
         
         //1. Pull data from our client (body)
-        const { title, description, messages} = req.body;
+        const { title, description, messages, ownerName} = req.body;
 
         //2. Create a new object using the Model
         const conversation = new Conversation({
             title, description, messages,
-            owner_id: req.user.id
+            owner_id: req.user.id, ownerName
         });
 
         //3. Use mongoose method to save to MongoDB (storing it)
