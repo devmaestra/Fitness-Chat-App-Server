@@ -89,15 +89,15 @@
 ---
 * CREATE Profile (Post) // COMPLETE
 * READ (Get All Users by Location, Activity) 
-* UPDATE Profile (Patch) 
+* UPDATE Profile (Patch) // COMPLETE; can revisit how message is formed
 * DELETE Profile (Delete)
 ---
 
 ---
 ## Chat
 * CREATE new message (Post) 
-* READ (Get (all messages by Room))
-* READ (Get (all Rooms (one on one message session)))
+* READ (Get (all messages by Conversation))
+* READ (Get (all Conversations (one on one message session)))
 
     * leave record of deleted message? (empty message) // !*TODO - Stretch Goal
     * UPDATE edit message (Patch) // !*TODO - Stretch Goal

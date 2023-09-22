@@ -8,6 +8,7 @@ const cors = require('cors');
 
 const user = require ('./controllers/user.controller');
 const conversation = require('./controllers/conversation.controller') //added
+const message = require('./controllers/message.controller')
 
 
 // MIDDLEWARE
@@ -23,6 +24,7 @@ app.use(cors());
 
 app.use('/user', user);
 app.use('/conversation', conversation) //added
+app.use('/message', message) //added
 
 
 
