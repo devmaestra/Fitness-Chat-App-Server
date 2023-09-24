@@ -15,13 +15,13 @@ const MessageSchema = new mongoose.Schema({
         type: mongoose.Types.ObjectId,
         ref: 'User'
     },
+    username: {
+        type: String,
+    },
     conversation_Id: {
         // type: String,
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Conversation'
-    },
-    username: {
-        type: String,
     },
 });
 

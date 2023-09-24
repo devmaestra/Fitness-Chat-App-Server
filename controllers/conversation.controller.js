@@ -1,5 +1,7 @@
 const router = require('express').Router()
 const Conversation = require('../models/conversation.model')
+const Message = require('../models/')
+const User = require('../models/user.model') // Import the User Model
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const SECRET = process.env.JWT
@@ -20,12 +22,18 @@ router.post('/', validateSession, async (req, res) => {
     try {
         
         //1. Pull data from our client (body)
-        const { title, description, messages, ownerName} = req.body;
+        const { title, users } = req.body;
 
-        //2. Create a new object using the Model
+        //2. Get the username of the currently logged-in user
+        const username = req.user.username;
+
+        //3. Create a new object using the Model
         const conversation = new Conversation({
-            title, description, messages,
-            owner_id: req.user.id, ownerName
+            title,
+            users, 
+            messages: [], // Initializes messages as an empty arry
+            owner_Id: req.user.id,
+            ownerName: username, // Set ownername to the username of the logged-in user
         });
 
         //3. Use mongoose method to save to MongoDB (storing it)
@@ -34,7 +42,7 @@ router.post('/', validateSession, async (req, res) => {
         //4. Client response
         res.status(200).json({
         newConversation,
-        message: `${newConversation.title} added to collection!`
+        message: `${newConversation.title} added to Conversation collection!`
     })
 
     } catch (err) {
