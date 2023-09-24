@@ -23,32 +23,64 @@ router.post('/', validateSession, async (req, res) => {
     try {
         //1. Pull data from client (body)
         const { text } = req.body;
-        const conversation_Id = req.params.conversation_Id;
         const owner_Id = req.user.id;
         const username = req.user.username
-        console.log(username)
+        const { conversation_Id, target_Id, targetUsername } = req.body;
+        // const conversation_Id = req.params.conversation_Id;
+        
+// After extracting values from req.body //! CONSOLE LOGS
+        console.log(`Received target_Id: ${target_Id}`);
+        console.log(`Received targetUsername: ${targetUsername}`);
+        console.log(`Received conversation_Id: ${conversation_Id}`);
+
+        // console.log(username)
+        // console.log(`target_Id:`, target_Id);
+        // console.log(`targetUsername:`, targetUsername);
 
         //2. Create new object using the Model
         const message = new Message({
-            date: new Date(),
             text,
-            owner_Id: owner_Id, // declared above
-            conversation_Id: conversation_Id,
-            username: username,
+            date: new Date(),
+            username,
+            owner_Id, // declared above
+            target_Id,
+            targetUsername, // include the targetUsername
         });
 
         //3. Use mongoose method to save to MongoDB
         const newMessage = await message.save();
+        console.log(newMessage); //! CONSOLE LOG
+
         const conversationMessage = {
-            id: newMessage._id,
+            _id: newMessage._id,
             text: newMessage.text,
             date: newMessage.date,
             username: newMessage.username,
+            owner_Id: newMessage.owner_Id,
+            target_Id: target_Id,
+            targetUsername: targetUsername, // Include targetUsername
         };
-        await Conversation.findOneAndUpdate(
-            { _id: conversation_Id },
-            { $push: { messages: conversationMessage } }
-        );
+        // console.log(`conversationMessage:`, conversationMessage, `.`); //! CONSOLE LOG
+        
+        try {
+            const updatedConversation = await Conversation.findOneAndUpdate(
+                { _id: conversation_Id },
+                { $push: { messages: conversationMessage } },
+                { new: true } // To return the updated document
+            );
+
+            console.log(`findOneAndUpdate:`, conversationMessage, `.`); //! CONSOLE LOG
+        
+            if (!updatedConversation) {
+                return res.status(404).json({ error: 'Conversation not found' });
+            }
+        
+            // If the update is successful, return a success response
+            return success(res, updatedConversation);
+        } catch (err) {
+            error(res, err);
+        }
+
 
         newMessage ? success(res, newMessage) : incomplete(res);
     } catch (err) {

@@ -29,7 +29,9 @@ router.post('/signup', async (req, res) => {
             lastName: req.body.lastName,
             bioTagline: req.body.bioTagline,
             bioParagraph: req.body.bioParagraph,
-            userImage: req.body.userImage
+            userImage: req.body.userImage,
+            friends: req.body.friends,
+            active: req.body.active,
         });
 
         const newUser = await user.save();
@@ -107,6 +109,26 @@ router.patch('/:id/edit', async (req, res) => {
         errorResponse(res, err)
     }
 })
+
+//! WORK IN PROGRESS FOR FRONT END GET TARGETUSER BY TARGET_ID
+//! On the frontend, you can make a request to /api/users/:target_Id with the target_Id to retrieve the target user's details, including their username.
+
+//TODO Backend API endpoint to get target user details by target_Id
+// app.get('/api/users/:target_Id', (req, res) => {
+//     const { target_Id } = req.params;
+
+//     // Fetch target user's details from your User model
+//     User.findOne({ _id: target_Id })
+//         .then(targetUser => {
+//             // Respond with the target user's details
+//             res.json(targetUser);
+//         })
+//         .catch(err => {
+//             // Handle errors if user not found, etc.
+//             res.status(500).json({ error: err.message });
+//         });
+// });
+
 
 module.exports = router;
 
