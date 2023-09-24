@@ -50,4 +50,68 @@ router.post('/', validateSession, async (req, res) => {
     }
 });
 
+// ADMIN: Get all conversations by all users
+router.get('/', validateSession, async(req, res) => {
+
+    try {
+
+        const getAllConversations = await Conversation.find();
+
+        getAllConversations ?
+            res.status(200).json({
+                getAllConversations
+            }) :
+            res.status(404).json({
+                message: `No conversations found`
+            });
+
+    } catch (err) {
+        errorResponse(res, err);
+    }
+});
+
+
+//Get All Conversations including logged in user:
+// future devs: keyword here is getAllConversations for FE
+router.get('/myconversations', validateSession, async(req, res) => {
+
+    const userId = req.user.id
+
+    try {
+
+        const getAllConversations = await Conversation.find({users: userId});
+
+        getAllConversations ?
+            res.status(200).json({
+                getAllConversations
+            }) :
+            res.status(404).json({
+                message: `No conversations found`
+            });
+
+    } catch (err) {
+        errorResponse(res, err);
+    }
+});
+
+//Delete A Conversation (if owner)
+router.delete('/:id', validateSession, async(req, res) => {
+    try {
+        const { id } = req.params;
+
+        const deleteConversation = await Conversation.deleteOne({_id: id, owner_Id: req.user.id});
+
+        deleteConversation.deletedCount ?
+            res.status(200).json({
+                message: 'Conversation deleted!'
+            }) :
+            res.status(404).json({
+                message: "No conversation in collection!"
+            })
+        
+    } catch (err) {
+        errorResponse(res, err);
+    }
+});
+
 module.exports = router;
