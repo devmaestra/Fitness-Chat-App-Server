@@ -6,6 +6,8 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const SECRET = process.env.JWT
 const validateSession = require('../middleware/validate-session')
+const { formatDate } = require('../helpers/dateUtils'); //! new DATE handling
+
 
 
 // Error Response function
@@ -50,7 +52,7 @@ router.post('/', validateSession, async (req, res) => {
     }
 });
 
-// ADMIN: Get all conversations by all users
+//TODO ADMIN: Get all conversations by all users
 router.get('/', validateSession, async(req, res) => {
 
     try {
@@ -71,7 +73,7 @@ router.get('/', validateSession, async(req, res) => {
 });
 
 
-//Get All Conversations including logged in user:
+//TODO Get All Conversations including logged in user:
 // future devs: keyword here is getAllConversations for FE
 router.get('/myconversations', validateSession, async(req, res) => {
 
@@ -94,7 +96,7 @@ router.get('/myconversations', validateSession, async(req, res) => {
     }
 });
 
-//Delete A Conversation (if owner)
+//TODO Delete A Conversation (if owner)
 router.delete('/:id', validateSession, async(req, res) => {
     try {
         const { id } = req.params;
