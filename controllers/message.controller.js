@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const Conversation = require('../models/conversation.model');
 const Message = require('../models/message.model');
-// const User = require('./user.controller')
+const { formatDate } = require('../helpers/dateUtils'); //! new DATE handling
 const { error, success, incomplete } = require("../helpers");
 
 //* Validate Session
@@ -15,6 +15,11 @@ const errorResponse = (res, error) => {
         })
     )
 };
+
+const currentDate = new Date(); //! new DATE handling
+const formattedDate = formatDate(currentDate); //! new DATE handling
+// console.log(formattedDate); // Example output: "2023-09-25 21:42:12 EDT"
+console.log(`Formatted DATE is ${formattedDate}`);
 
 //* -----------------------------------------------------------------------
 //TODO POST - create a message for a Conversation
@@ -40,7 +45,7 @@ router.post('/', validateSession, async (req, res) => {
         //2. Create new object using the Model
         const message = new Message({
             text,
-            date: new Date(),
+            date: formattedDate, // new Date(),  //! new DATE handling
             username,
             owner_Id, // declared above
             target_Id,

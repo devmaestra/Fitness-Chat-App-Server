@@ -40,7 +40,7 @@ const UserSchema = new mongoose.Schema({
     friends : {
         type: [String] //! array of ObjectId or username of all conversations?
     },
-    active : {
+    active : { // change to "visible" ?
         type: Boolean,
         required: true
     }

@@ -88,7 +88,7 @@
 
 ---
 * CREATE Profile (Post) // COMPLETE
-* READ (Get All Users by Location, Activity) 
+* READ (Get All Users by Location, ~~Activity~~) COMPLETE
 * UPDATE Profile (Patch) // COMPLETE; can revisit how message is formed
 * DELETE Profile (Delete)
 ---

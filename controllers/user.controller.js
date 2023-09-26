@@ -4,6 +4,8 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const SECRET = process.env.JWT;
 
+//* Validate Session
+const validateSession = require('../middleware/validate-session');
 
 // Error Response function
 const errorResponse = (res, error) => {
@@ -15,7 +17,7 @@ const errorResponse = (res, error) => {
 }
 
 
-//SIGNUP
+//TODO SIGNUP
 router.post('/signup', async (req, res) => {
 
     try {
@@ -51,7 +53,7 @@ router.post('/signup', async (req, res) => {
     }
 });
 
-//LOGIN
+//TODO LOGIN
 
 router.post('/login', async (req, res) => {
     try {
@@ -76,7 +78,7 @@ router.post('/login', async (req, res) => {
 })
 
 
-//TODO PATCH One - Make Updates
+//TODO PATCH One - Make Updates to User Profile
 // *** ValidateSession was removed from this endpoint***
 
 router.patch('/:id/edit', async (req, res) => {
@@ -109,6 +111,86 @@ router.patch('/:id/edit', async (req, res) => {
         errorResponse(res, err)
     }
 })
+
+
+//TODO DELETE One - Delete User by ID
+router.delete('/:id', validateSession, async (req,res) => {
+
+    try {
+
+        //2. Pull value from parameters
+        const { id } = req.params;
+
+        //1. Pull value from User auth
+        // const userId = req.user.id;
+        const userName = id.username;
+        console.log(userName);
+
+
+        //3. Use delete method to locate and remove based off ID
+        const deleteUser = await User.deleteOne({_id: id});
+
+        //4. Respond to client
+        deleteUser.deletedCount ?
+            res.status(200).json({
+                message: "User deleted from collection."
+                // message: "User " + userName + " deleted from collection." //! To Fix
+            }) :
+            res.status(404).json({
+                message: 'No such user in collection.'
+            })
+                
+    } catch (err) {
+        errorResponse(res, err);
+    }
+})
+
+//TODO Get All Matches for logged in user based on Zip Codes:
+
+router.get('/matches', validateSession, async (req, res) => {
+
+    //1. Pull value from User auth
+    const userId = req.user.id;
+    const userName = req.user.username;
+    const userZip = req.user.locationZip;
+
+    try {
+
+        let getMatchByZip = await User.find({locationZip: userZip, active: true}); // Find by Zip Code if Active: true.
+        const removedSelf = getMatchByZip.filter(user => user.id !== userId);
+
+        getMatchByZip = removedSelf; // Reassign the array of matches, after filtering out SELF.
+
+        const matchNames = getMatchByZip.map(user => user.username); // Extract Names from the Find into a new Array.
+        const matchIds = getMatchByZip.map(user => user.id); // Extract Names from the Find into a new Array.
+
+        const matchData = getMatchByZip.map(user => ({
+            name: user.username,
+            id: user.id
+        }));
+
+        console.log(`Logged in as ${userName}. Here are your MATCHES:`);
+        console.log(matchNames);
+        console.log(matchIds);
+        console.log(matchData);
+        console.log(getMatchByZip);
+
+        getMatchByZip ?
+            res.status(200).json({
+                message:`Logged in as ${userName} (user: ${userId}). Here are your MATCHES:`,
+                matchNames,
+                matchIds,
+                matchData,
+                getMatchByZip
+            }) :
+            res.status(404).json({
+                message: `No zipcode matches found.`
+            });
+
+    } catch (err) {
+        errorResponse(res, err);
+    }
+});
 
 //! WORK IN PROGRESS FOR FRONT END GET TARGETUSER BY TARGET_ID
 //! On the frontend, you can make a request to /api/users/:target_Id with the target_Id to retrieve the target user's details, including their username.
