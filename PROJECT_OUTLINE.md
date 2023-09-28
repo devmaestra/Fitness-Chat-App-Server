@@ -1,12 +1,12 @@
-# Architectural Outline (My FitNest (?))
+# Architectural Outline
 
 ## Front-end (mobile first)
 
 ### Navigation Bar (Material UI at bottom (footer nav))
 
-### Splash/Entry/Loading Page (Nature Theme / Nesting)
+### Splash/Entry/Loading Page SWOULmates
     * Graphic / Branding
-    * Dual Nature Theme, Spring/Summer, Egg (?)
+    * Theme? Soul? Swole?
     * Fitness For **EVERYONE** (?)
     * 2-5 Seconds or Click to Enter?
 ---
@@ -27,7 +27,7 @@
             - availability time blocks
         - Chat Button
 
-        - Button to Save To Nest // TODO - (Stretch Goal)
+        - Button to Save To Friends // TODO - (Stretch Goal)
         - Button to Remove a Match // TODO - (Stretch Goal)
         - location tag (necessary?) // TODO - (Stretch Goal)
 ---
@@ -39,9 +39,9 @@
     - Logout
 
 ### Admin Manage 
-    - View All User Profiles
-    - Edit All User Profiles
-    - Delete User (Move to Archive)
+    - View All User Profiles COMPLETE
+    - Edit All User Profiles 
+    - Delete User (Or Suspend)
 
     // *TODO Stretch Goals 
     - Suspend User (Stretch Goal)
@@ -78,7 +78,7 @@
 ### EndPoints
 ---
 ## Match by:
-- Activity !*
+- ~~Activity !*~~
 - Location (compare Zip Code proximity?) !*
 
     - Age Group // *TODO - Add to Search Logic
@@ -90,14 +90,14 @@
 * CREATE Profile (Post) // COMPLETE
 * READ (Get All Users by Location, ~~Activity~~) COMPLETE
 * UPDATE Profile (Patch) // COMPLETE; can revisit how message is formed
-* DELETE Profile (Delete)
+* DELETE Profile (Delete) // Mostly COMPLETE
 ---
 
 ---
 ## Chat
-* CREATE new message (Post) 
-* READ (Get (all messages by Conversation))
-* READ (Get (all Conversations (one on one message session)))
+* CREATE new message (Post) COMPLETE
+* READ (Get (all messages by Conversation)) COMPLETE
+* READ (Get (all Conversations (one on one message session) by Logged In User)) COMPLETE
 
     * leave record of deleted message? (empty message) // !*TODO - Stretch Goal
     * UPDATE edit message (Patch) // !*TODO - Stretch Goal

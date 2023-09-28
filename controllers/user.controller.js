@@ -2,6 +2,7 @@ const router = require('express').Router();
 const User = require('../models/user.model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const keys = require('../helpers/keys');
 const SECRET = process.env.JWT;
 
 //* Validate Session
@@ -147,16 +148,19 @@ router.delete('/:id', validateSession, async (req,res) => {
 
 //TODO Get All Matches for logged in user based on Zip Codes:
 
+// router.get(FREEMAPURL/)
 router.get('/matches', validateSession, async (req, res) => {
 
     //1. Pull value from User auth
     const userId = req.user.id;
     const userName = req.user.username;
     const userZip = req.user.locationZip;
+    const localRadiusZips = [ 49735, 49700, 49811, 49800, 49810 ];
 
     try {
 
-        let getMatchByZip = await User.find({locationZip: userZip, active: true}); // Find by Zip Code if Active: true.
+        let getMatchByZip = await User.find({ locationZip: { $in: localRadiusZips }, active: true }); // Use ARRAY to find by Zip Code if Active: true.
+        // let getMatchByZip = await User.find({locationZip: userZip, active: true}); // Find by Zip Code if Active: true.
         const removedSelf = getMatchByZip.filter(user => user.id !== userId);
 
         getMatchByZip = removedSelf; // Reassign the array of matches, after filtering out SELF.
@@ -168,6 +172,13 @@ router.get('/matches', validateSession, async (req, res) => {
             name: user.username,
             id: user.id
         }));
+
+        // let locals = [];
+
+        // for(let i = 0; i <= getMatchByZip.length; i++) {
+        //     let user = await User.find({locationZip: getMatchByZip[i]}).limit(3)
+        //     locals.push(user)
+        // }
 
         console.log(`Logged in as ${userName}. Here are your MATCHES:`);
         console.log(matchNames);
