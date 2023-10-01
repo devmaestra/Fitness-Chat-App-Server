@@ -91,6 +91,11 @@
 * READ (Get All Users by Location, ~~Activity~~) COMPLETE
 * UPDATE Profile (Patch) // COMPLETE; can revisit how message is formed
 * DELETE Profile (Delete) // Mostly COMPLETE
+
+- Forgot & Reset Password
+* CREATE (Post) Forgot PASSWORD
+* READ (Get) Reset PASSWORD
+* CREATE (Post) Confirm PASSWORD
 ---
 
 ---

@@ -2,10 +2,12 @@ const router = require('express').Router();
 const User = require('../models/user.model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const keys = require('../helpers/keys');
 const SECRET = process.env.JWT;
 
-//* Validate Session
+const config = require('../helpers/config')
+
+
+//TODO Validate Session
 const validateSession = require('../middleware/validate-session');
 
 // Error Response function
@@ -35,6 +37,7 @@ router.post('/signup', async (req, res) => {
             userImage: req.body.userImage,
             friends: req.body.friends,
             active: req.body.active,
+            admin: false
         });
 
         const newUser = await user.save();
@@ -119,10 +122,10 @@ router.delete('/:id', validateSession, async (req,res) => {
 
     try {
 
-        //2. Pull value from parameters
+        //1. Pull value from parameters
         const { id } = req.params;
 
-        //1. Pull value from User auth
+        //2. Pull value from User auth
         // const userId = req.user.id;
         const userName = id.username;
         console.log(userName);
@@ -146,18 +149,78 @@ router.delete('/:id', validateSession, async (req,res) => {
     }
 })
 
+
+// //! Function to Fetch based on Category
+// function fakeStore(endpoint) {  // FakeStore Function
+//     fetch(baseURL + endpoint)
+//         .then((res) => res.json())
+//         .then((data) => {           // Process the fetched items data
+//             let eachObj = data.map((item) => ({
+//                 id: item.id,
+//                 title: item.title,
+//                 desc: item.description,
+//                 price: item.price,
+//                 img: item.image,
+//                 category: item.category
+//             }));
+
+//             displayCards(eachObj);
+//         })
+//         .catch((err) => {
+//             console.error('Error:', err);
+//         });
+// }
+
+//! Function to Fetch Zips based on userZip and radius:
+
+async function fetchZipData (userZip, radius) {
+    const apiKey = config.apiKey;
+    const apiUrl = `${config.apiUrl}?zip=${userZip}&radius=${radius}&showcity=true&key=${apiKey}`;
+
+    // console.log(config.apiKey);
+    // console.log(config.apiUrl);
+
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        console.log('API Response:', data); // Output to see the structure of the API response
+
+        return data; // This should be the response object containing zip codes and distances
+    }   catch (error) {
+        console.error('Error fetching zip code data:', error);
+        throw error;
+    }
+}
+
 //TODO Get All Matches for logged in user based on Zip Codes:
 
-// router.get(FREEMAPURL/)
 router.get('/matches', validateSession, async (req, res) => {
 
-    //1. Pull value from User auth
+    //1. Pull value from User Auth
     const userId = req.user.id;
     const userName = req.user.username;
     const userZip = req.user.locationZip;
-    const localRadiusZips = [ 49735, 49700, 49811, 49800, 49810 ];
+    const radius = 6;
+    // const localRadiusZips = [ 49735, 49700, 49811, 49800, 49810 ];
 
     try {
+
+        const localRadiusData = await fetchZipData(userZip, radius);
+
+        // Ensure that localRadiusData has the expected structure
+        if (!Array.isArray(localRadiusData.output)) {
+            throw new Error('API response does not have the expected structure.');
+        }
+
+        const localRadiusZips = localRadiusData.output.map(entry => entry.zip); // extract zip codes
+        const localRadiusCities = localRadiusData.output.map(entry => entry.city); // extract zip codes
+        console.log(localRadiusZips);
+        console.log(localRadiusCities);
 
         let getMatchByZip = await User.find({ locationZip: { $in: localRadiusZips }, active: true }); // Use ARRAY to find by Zip Code if Active: true.
         // let getMatchByZip = await User.find({locationZip: userZip, active: true}); // Find by Zip Code if Active: true.
@@ -191,6 +254,7 @@ router.get('/matches', validateSession, async (req, res) => {
                 message:`Logged in as ${userName} (user: ${userId}). Here are your MATCHES:`,
                 matchNames,
                 matchIds,
+                localRadiusCities,
                 matchData,
                 getMatchByZip
             }) :
