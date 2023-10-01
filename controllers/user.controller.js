@@ -82,9 +82,9 @@ router.post('/login', async (req, res) => {
     }
 })
 
-// FORGOT PASSWORD & SEND EMAIL//
+//! FORGOT PASSWORD & SEND EMAIL//
 
-router.post('/forgot-password', async (req, res) => {
+router.post('/forgot-password', validateSession, async (req, res) => {
     const { email } = req.body;
     try {
         const oldUser = await User.findOne({ email });
@@ -94,14 +94,14 @@ router.post('/forgot-password', async (req, res) => {
     const secret = JWT + oldUser.password;
     const token = jwt.sign({email: oldUser.email, id: oldUser._id }, secret, {expiresIn: "5m",
 })
-const link = `http://localhost:3000/reset-password/${oldUser._id}/${token}`;
+const link = `http://localhost:4001/reset-password/${oldUser._id}/${token}`;
 var nodemailer = require('nodemailer');
 
 var transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: 'youremail@gmail.com',
-    pass: 'yourpassword'
+    pass: 'yourpassword' // watch php mailer video
   }
 });
 
@@ -131,7 +131,7 @@ router.get('/reset-password/:id/:token', async (req,res) => {
     if(!oldUser){
         return res.json({ status: "User Does Not Exist" });
     }
-    const secret = JWT + oldUser.password;
+    const secret = jwt + oldUser.password; //JWT vs. jwt?
     try {
         const verify = jwt.verify(token, secret);
         // res.send("Verified");
@@ -142,7 +142,7 @@ router.get('/reset-password/:id/:token', async (req,res) => {
     // res.send("Done"); //remove this later once verified messages come through
 });
 
-router.post('/reset-password/:id/:token', async (req,res) => {
+router.post('/reset-password/:id/:token', validateSession, async (req,res) => {
     const { id, token } = req.params;
     // console.log(req.params); do first
     const { password } = req.body;
@@ -150,7 +150,7 @@ router.post('/reset-password/:id/:token', async (req,res) => {
     if(!oldUser){
         return res.json({ status: "User Does Not Exist"});
     }
-    const secret = JWT + oldUser.password;
+    const secret = jwt + oldUser.password; //JWT vs. jwt?
     try {
         const verify = jwt.verify(token, secret);
         const encryptedPassword = await bcryct.hash(password, 10);
