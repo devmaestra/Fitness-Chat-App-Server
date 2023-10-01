@@ -43,7 +43,6 @@ router.post('/signup', async (req, res) => {
             friends: req.body.friends,
             active: req.body.active,
             admin: false
-            admin: false
         });
 
         const newUser = await user.save();
