@@ -9,6 +9,10 @@ const config = require('../helpers/config')
 
 //TODO Validate Session
 
+const config = require('../helpers/config')
+
+
+//TODO Validate Session
 const validateSession = require('../middleware/validate-session');
 
 // Error Response function
@@ -38,6 +42,7 @@ router.post('/signup', async (req, res) => {
             userImage: req.body.userImage,
             friends: req.body.friends,
             active: req.body.active,
+            admin: false
             admin: false
         });
 
@@ -213,10 +218,10 @@ router.delete('/:id', validateSession, async (req,res) => {
 
     try {
 
-        //2. Pull value from parameters
+        //1. Pull value from parameters
         const { id } = req.params;
 
-        //1. Pull value from User auth
+        //2. Pull value from User auth
         // const userId = req.user.id;
         const userName = id.username;
         console.log(userName);
