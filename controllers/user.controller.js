@@ -246,7 +246,7 @@ router.delete('/:id', validateSession, async (req,res) => {
 
 
 
-// //! Function to Fetch based on Category
+//! Function to Fetch based on Category
 // function fakeStore(endpoint) {  // FakeStore Function
 //     fetch(baseURL + endpoint)
 //         .then((res) => res.json())
@@ -269,29 +269,29 @@ router.delete('/:id', validateSession, async (req,res) => {
 
 //! Function to Fetch Zips based on userZip and radius:
 
-// async function fetchZipData (userZip, radius) {
-//     const apiKey = config.apiKey;
-//     const apiUrl = `${config.apiUrl}?zip=${userZip}&radius=${radius}&showcity=true&key=${apiKey}`;
+async function fetchZipData (userZip, radius) {
+    const apiKey = config.apiKey;
+    const apiUrl = `${config.apiUrl}?zip=${userZip}&radius=${radius}&showcity=true&key=${apiKey}`;
 
-//     // console.log(config.apiKey);
-//     // console.log(config.apiUrl);
+    // console.log(config.apiKey);
+    // console.log(config.apiUrl);
 
-//     try {
-//         const response = await fetch(apiUrl);
-//         if (!response.ok) {
-//             throw new Error(`HTTP error! Status: ${response.status}`);
-//         }
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
 
-//         const data = await response.json();
+        const data = await response.json();
 
-//         console.log('API Response:', data); // Output to see the structure of the API response
+        console.log('API Response:', data); // Output to see the structure of the API response
 
-//         return data; // This should be the response object containing zip codes and distances
-//     }   catch (error) {
-//         console.error('Error fetching zip code data:', error);
-//         throw error;
-//     }
-// }
+        return data; // This should be the response object containing zip codes and distances
+    }   catch (error) {
+        console.error('Error fetching zip code data:', error);
+        throw error;
+    }
+}
 
 //TODO Get All Matches for logged in user based on Zip Codes:
 
@@ -333,7 +333,7 @@ router.get('/matches', validateSession, async (req, res) => {
             id: user.id
         }));
 
-        // let locals = [];
+        //FIXME -  let locals = [];
 
         // for(let i = 0; i <= getMatchByZip.length; i++) {
         //     let user = await User.find({locationZip: getMatchByZip[i]}).limit(3)
