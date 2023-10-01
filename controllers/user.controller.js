@@ -2,10 +2,13 @@ const router = require('express').Router();
 const User = require('../models/user.model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const keys = require('../helpers/keys');
 const SECRET = process.env.JWT;
+var nodemailer = require('nodemailer');
+const config = require('../helpers/config')
 
-//* Validate Session
+
+//TODO Validate Session
+
 const validateSession = require('../middleware/validate-session');
 
 // Error Response function
@@ -35,6 +38,7 @@ router.post('/signup', async (req, res) => {
             userImage: req.body.userImage,
             friends: req.body.friends,
             active: req.body.active,
+            admin: false
         });
 
         const newUser = await user.save();
@@ -78,6 +82,96 @@ router.post('/login', async (req, res) => {
     }
 })
 
+// FORGOT PASSWORD & SEND EMAIL//
+
+router.post('/forgot-password', async (req, res) => {
+    const { email } = req.body;
+    try {
+        const oldUser = await User.findOne({ email });
+        if(!oldUser){
+            return res.json({status: "User Does Not Exist"});
+        }
+    const secret = JWT + oldUser.password;
+    const token = jwt.sign({email: oldUser.email, id: oldUser._id }, secret, {expiresIn: "5m",
+})
+const link = `http://localhost:3000/reset-password/${oldUser._id}/${token}`;
+var nodemailer = require('nodemailer');
+
+var transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'youremail@gmail.com',
+    pass: 'yourpassword'
+  }
+});
+
+var mailOptions = {
+  from: 'swoulmatesapp@gmail.com',
+  to: 'swoulmatesapp@gmail.com',
+  subject: 'Password Reset',
+  text: link,
+};
+
+transporter.sendMail(mailOptions, function(error, info){
+  if (error) {
+    console.log(error);
+  } else {
+    console.log('Email sent: ' + info.response);
+  }
+});
+console.log(link);
+
+    } catch (error) {}
+});
+
+router.get('/reset-password/:id/:token', async (req,res) => {
+    const { id, token } = req.params;
+    console.log(req.params);
+    const oldUser = await User.findOne({ _id: id });
+    if(!oldUser){
+        return res.json({ status: "User Does Not Exist" });
+    }
+    const secret = JWT + oldUser.password;
+    try {
+        const verify = jwt.verify(token, secret);
+        // res.send("Verified");
+        res.render("forgot", { email: verify.email, status: "Not Verified"});
+    } catch (error) {
+        res.send("Not Verified");
+    }
+    // res.send("Done"); //remove this later once verified messages come through
+});
+
+router.post('/reset-password/:id/:token', async (req,res) => {
+    const { id, token } = req.params;
+    // console.log(req.params); do first
+    const { password } = req.body;
+    const oldUser = await User.findOne({ _id: id });
+    if(!oldUser){
+        return res.json({ status: "User Does Not Exist"});
+    }
+    const secret = JWT + oldUser.password;
+    try {
+        const verify = jwt.verify(token, secret);
+        const encryptedPassword = await bcryct.hash(password, 10);
+        await User.updateOne({
+            _id: id,
+        },
+        {
+         $set: {
+            password: encryptedPassword,
+         },
+        }
+        );
+        res.json({ status: "Password Updated" });
+        // res.send("Verified");done first to make sure it is connected
+        res.render("index", { email: verify.email, status:"verified" });
+    } catch (error) {
+        console.log(error);
+        res.json({ status: "Something Went Wrong" });
+    }
+    res.send("Done"); //remove this later once verified messages come through
+});
 
 //TODO PATCH One - Make Updates to User Profile
 // *** ValidateSession was removed from this endpoint***
@@ -146,18 +240,80 @@ router.delete('/:id', validateSession, async (req,res) => {
     }
 })
 
+
+
+// //! Function to Fetch based on Category
+// function fakeStore(endpoint) {  // FakeStore Function
+//     fetch(baseURL + endpoint)
+//         .then((res) => res.json())
+//         .then((data) => {           // Process the fetched items data
+//             let eachObj = data.map((item) => ({
+//                 id: item.id,
+//                 title: item.title,
+//                 desc: item.description,
+//                 price: item.price,
+//                 img: item.image,
+//                 category: item.category
+//             }));
+
+//             displayCards(eachObj);
+//         })
+//         .catch((err) => {
+//             console.error('Error:', err);
+//         });
+// }
+
+//! Function to Fetch Zips based on userZip and radius:
+
+// async function fetchZipData (userZip, radius) {
+//     const apiKey = config.apiKey;
+//     const apiUrl = `${config.apiUrl}?zip=${userZip}&radius=${radius}&showcity=true&key=${apiKey}`;
+
+//     // console.log(config.apiKey);
+//     // console.log(config.apiUrl);
+
+//     try {
+//         const response = await fetch(apiUrl);
+//         if (!response.ok) {
+//             throw new Error(`HTTP error! Status: ${response.status}`);
+//         }
+
+//         const data = await response.json();
+
+//         console.log('API Response:', data); // Output to see the structure of the API response
+
+//         return data; // This should be the response object containing zip codes and distances
+//     }   catch (error) {
+//         console.error('Error fetching zip code data:', error);
+//         throw error;
+//     }
+// }
+
 //TODO Get All Matches for logged in user based on Zip Codes:
 
-// router.get(FREEMAPURL/)
 router.get('/matches', validateSession, async (req, res) => {
 
-    //1. Pull value from User auth
+    //1. Pull value from User Auth
     const userId = req.user.id;
     const userName = req.user.username;
     const userZip = req.user.locationZip;
-    const localRadiusZips = [ 49735, 49700, 49811, 49800, 49810 ];
+    const radius = 6;
+    // const localRadiusZips = [ 49735, 49700, 49811, 49800, 49810 ];
 
     try {
+
+        
+        const localRadiusData = await fetchZipData(userZip, radius);
+
+        // Ensure that localRadiusData has the expected structure
+        if (!Array.isArray(localRadiusData.output)) {
+            throw new Error('API response does not have the expected structure.');
+        }
+
+        const localRadiusZips = localRadiusData.output.map(entry => entry.zip); // extract zip codes
+        const localRadiusCities = localRadiusData.output.map(entry => entry.city); // extract zip codes
+        console.log(localRadiusZips);
+        console.log(localRadiusCities);
 
         let getMatchByZip = await User.find({ locationZip: { $in: localRadiusZips }, active: true }); // Use ARRAY to find by Zip Code if Active: true.
         // let getMatchByZip = await User.find({locationZip: userZip, active: true}); // Find by Zip Code if Active: true.
@@ -191,6 +347,7 @@ router.get('/matches', validateSession, async (req, res) => {
                 message:`Logged in as ${userName} (user: ${userId}). Here are your MATCHES:`,
                 matchNames,
                 matchIds,
+                localRadiusCities,
                 matchData,
                 getMatchByZip
             }) :

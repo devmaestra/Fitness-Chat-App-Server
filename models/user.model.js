@@ -43,6 +43,10 @@ const UserSchema = new mongoose.Schema({
     active : { // change to "visible" ?
         type: Boolean,
         required: true
+    },
+    admin : { // change to "visible" ?
+        type: Boolean,
+        required: true
     }
     
 });
