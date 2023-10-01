@@ -3,6 +3,11 @@ const User = require('../models/user.model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const SECRET = process.env.JWT;
+var nodemailer = require('nodemailer');
+const config = require('../helpers/config')
+
+
+//TODO Validate Session
 
 const config = require('../helpers/config')
 
@@ -37,6 +42,7 @@ router.post('/signup', async (req, res) => {
             userImage: req.body.userImage,
             friends: req.body.friends,
             active: req.body.active,
+            admin: false
             admin: false
         });
 
@@ -81,6 +87,96 @@ router.post('/login', async (req, res) => {
     }
 })
 
+//! FORGOT PASSWORD & SEND EMAIL//
+
+router.post('/forgot-password', validateSession, async (req, res) => {
+    const { email } = req.body;
+    try {
+        const oldUser = await User.findOne({ email });
+        if(!oldUser){
+            return res.json({status: "User Does Not Exist"});
+        }
+    const secret = JWT + oldUser.password;
+    const token = jwt.sign({email: oldUser.email, id: oldUser._id }, secret, {expiresIn: "5m",
+})
+const link = `http://localhost:4001/reset-password/${oldUser._id}/${token}`;
+var nodemailer = require('nodemailer');
+
+var transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'youremail@gmail.com',
+    pass: 'yourpassword' // watch php mailer video
+  }
+});
+
+var mailOptions = {
+  from: 'swoulmatesapp@gmail.com',
+  to: 'swoulmatesapp@gmail.com',
+  subject: 'Password Reset',
+  text: link,
+};
+
+transporter.sendMail(mailOptions, function(error, info){
+  if (error) {
+    console.log(error);
+  } else {
+    console.log('Email sent: ' + info.response);
+  }
+});
+console.log(link);
+
+    } catch (error) {}
+});
+
+router.get('/reset-password/:id/:token', async (req,res) => {
+    const { id, token } = req.params;
+    console.log(req.params);
+    const oldUser = await User.findOne({ _id: id });
+    if(!oldUser){
+        return res.json({ status: "User Does Not Exist" });
+    }
+    const secret = jwt + oldUser.password; //JWT vs. jwt?
+    try {
+        const verify = jwt.verify(token, secret);
+        // res.send("Verified");
+        res.render("forgot", { email: verify.email, status: "Not Verified"});
+    } catch (error) {
+        res.send("Not Verified");
+    }
+    // res.send("Done"); //remove this later once verified messages come through
+});
+
+router.post('/reset-password/:id/:token', validateSession, async (req,res) => {
+    const { id, token } = req.params;
+    // console.log(req.params); do first
+    const { password } = req.body;
+    const oldUser = await User.findOne({ _id: id });
+    if(!oldUser){
+        return res.json({ status: "User Does Not Exist"});
+    }
+    const secret = jwt + oldUser.password; //JWT vs. jwt?
+    try {
+        const verify = jwt.verify(token, secret);
+        const encryptedPassword = await bcryct.hash(password, 10);
+        await User.updateOne({
+            _id: id,
+        },
+        {
+         $set: {
+            password: encryptedPassword,
+         },
+        }
+        );
+        res.json({ status: "Password Updated" });
+        // res.send("Verified");done first to make sure it is connected
+        res.render("index", { email: verify.email, status:"verified" });
+    } catch (error) {
+        console.log(error);
+        res.json({ status: "Something Went Wrong" });
+    }
+    res.send("Done"); //remove this later once verified messages come through
+});
 
 //TODO PATCH One - Make Updates to User Profile
 // *** ValidateSession was removed from this endpoint***
@@ -150,6 +246,7 @@ router.delete('/:id', validateSession, async (req,res) => {
 })
 
 
+
 // //! Function to Fetch based on Category
 // function fakeStore(endpoint) {  // FakeStore Function
 //     fetch(baseURL + endpoint)
@@ -173,29 +270,29 @@ router.delete('/:id', validateSession, async (req,res) => {
 
 //! Function to Fetch Zips based on userZip and radius:
 
-async function fetchZipData (userZip, radius) {
-    const apiKey = config.apiKey;
-    const apiUrl = `${config.apiUrl}?zip=${userZip}&radius=${radius}&showcity=true&key=${apiKey}`;
+// async function fetchZipData (userZip, radius) {
+//     const apiKey = config.apiKey;
+//     const apiUrl = `${config.apiUrl}?zip=${userZip}&radius=${radius}&showcity=true&key=${apiKey}`;
 
-    // console.log(config.apiKey);
-    // console.log(config.apiUrl);
+//     // console.log(config.apiKey);
+//     // console.log(config.apiUrl);
 
-    try {
-        const response = await fetch(apiUrl);
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
+//     try {
+//         const response = await fetch(apiUrl);
+//         if (!response.ok) {
+//             throw new Error(`HTTP error! Status: ${response.status}`);
+//         }
 
-        const data = await response.json();
+//         const data = await response.json();
 
-        console.log('API Response:', data); // Output to see the structure of the API response
+//         console.log('API Response:', data); // Output to see the structure of the API response
 
-        return data; // This should be the response object containing zip codes and distances
-    }   catch (error) {
-        console.error('Error fetching zip code data:', error);
-        throw error;
-    }
-}
+//         return data; // This should be the response object containing zip codes and distances
+//     }   catch (error) {
+//         console.error('Error fetching zip code data:', error);
+//         throw error;
+//     }
+// }
 
 //TODO Get All Matches for logged in user based on Zip Codes:
 
@@ -210,6 +307,7 @@ router.get('/matches', validateSession, async (req, res) => {
 
     try {
 
+        
         const localRadiusData = await fetchZipData(userZip, radius);
 
         // Ensure that localRadiusData has the expected structure
