@@ -104,8 +104,8 @@ var nodemailer = require('nodemailer');
 var transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'youremail@gmail.com',
-    pass: 'yourpassword' // watch php mailer video
+    user: 'swoulmatesapp@gmail.com',
+    pass: 'awcc clel qclr dmvg'
   }
 });
 
