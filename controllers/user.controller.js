@@ -3,12 +3,6 @@ const User = require('../models/user.model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const SECRET = process.env.JWT;
-var nodemailer = require('nodemailer');
-const config = require('../helpers/config')
-
-
-//TODO Validate Session
-
 const config = require('../helpers/config')
 
 
@@ -104,8 +98,8 @@ var nodemailer = require('nodemailer');
 var transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'youremail@gmail.com',
-    pass: 'yourpassword' // watch php mailer video
+    user: 'swoulmatesapp@gmail.com',
+    pass: 'awcc clel qclr dmvg'
   }
 });
 
