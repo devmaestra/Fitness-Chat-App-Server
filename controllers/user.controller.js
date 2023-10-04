@@ -3,6 +3,7 @@ const User = require('../models/user.model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const SECRET = process.env.JWT;
+const nodemailer = require('nodemailer');
 const config = require('../helpers/config')
 
 
@@ -85,42 +86,57 @@ router.post('/login', async (req, res) => {
 router.post('/forgot-password', validateSession, async (req, res) => {
     const { email } = req.body;
     try {
-        const oldUser = await User.findOne({ email });
-        if(!oldUser){
-            return res.json({status: "User Does Not Exist"});
+      const oldUser = await User.findOne({ email });
+  
+      if (!oldUser) {
+        return res.json({ status: "User Does Not Exist" });
+      }
+  
+      const SECRET = process.env.SECRET; 
+      const secret = SECRET + oldUser.password;
+      const token = jwt.sign({ email: oldUser.email, id: oldUser._id }, secret, { expiresIn: "5m" });
+  
+      const link = `http://localhost:4001/user/reset/${oldUser._id}/${token}`;
+  
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
+        auth: {
+          user: process.env.EMAIL,
+          pass: process.env.EMAIL_PASSWORD,
         }
-    const secret = JWT + oldUser.password;
-    const token = jwt.sign({email: oldUser.email, id: oldUser._id }, secret, {expiresIn: "5m",
-})
-const link = `http://localhost:4001/reset-password/${oldUser._id}/${token}`;
-var nodemailer = require('nodemailer');
+      });
+  
+      const mailOptions = {
+        from: process.env.EMAIL,
+        to: email,
+        subject: 'Password Reset Request',
+        text: `Click this ${link} to reset your password for the Swoulmates App`,
+      };
+  
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          return res.status(400).json({ message: "Error sending email" });
+        } else {
+          return res.status(200).json({ message: "Email Sent" });
+        }
+      });
+    } catch (error) {
+      return res.status(500).json({ message: "Server error" });
+    }
+  });
 
-var transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'swoulmatesapp@gmail.com',
-    pass: 'awcc clel qclr dmvg'
-  }
-});
+//     console.log(error);
+//   } else {
+//     console.log('Email sent: ' + info.response);
+//   }
+// });
+// console.log(link);
 
-var mailOptions = {
-  from: 'swoulmatesapp@gmail.com',
-  to: 'swoulmatesapp@gmail.com',
-  subject: 'Password Reset',
-  text: link,
-};
-
-transporter.sendMail(mailOptions, function(error, info){
-  if (error) {
-    console.log(error);
-  } else {
-    console.log('Email sent: ' + info.response);
-  }
-});
-console.log(link);
-
-    } catch (error) {}
-});
+//     } catch (error) {}
+// });
 
 router.get('/reset-password/:id/:token', async (req,res) => {
     const { id, token } = req.params;
