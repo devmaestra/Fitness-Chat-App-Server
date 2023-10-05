@@ -36,7 +36,7 @@ router.post('/signup', async (req, res) => {
             bioParagraph: req.body.bioParagraph,
             userImage: req.body.userImage,
             friends: req.body.friends,
-            active: req.body.active,
+            active: true,
             admin: false
         });
 
