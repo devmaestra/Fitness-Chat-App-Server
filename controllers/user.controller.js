@@ -84,44 +84,49 @@ router.post('/login', async (req, res) => {
 //! FORGOT PASSWORD & SEND EMAIL//
 
 router.post('/forgot-password', validateSession, async (req, res) => {
-    const { email } = req.body;
-    try {
-        const oldUser = await User.findOne({ email });
-        if(!oldUser){
-            return res.json({status: "User Does Not Exist"});
-        }
+  const { email } = req.body;
+  try {
+    const oldUser = await User.findOne({ email });
+
+    if (!oldUser) {
+      return res.json({ status: "User Does Not Exist" });
+    }
+
+    const SECRET = process.env.SECRET; 
     const secret = SECRET + oldUser.password;
-    const token = jwt.sign({email: oldUser.email, id: oldUser._id }, secret, {expiresIn: "5m",
-})
-const link = `http://localhost:4001/user/reset/${oldUser._id}/${token}`;
-const nodemailer = require('nodemailer');
+    const token = jwt.sign({ email: oldUser.email, id: oldUser._id }, secret, { expiresIn: "5m" });
 
-// this sends the email:
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  host: "smtp.gmail.com",
-  port: 465,
-  auth: {
-    user: process.env.EMAIL,
-    pass: process.env.EMAIL_PASSWORD,
+    const link = `http://localhost:4001/user/reset/${oldUser._id}/${token}`;
+
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.EMAIL_PASSWORD,
+      }
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL,
+      to: email,
+      subject: 'Password Reset Request',
+      text: `Click this ${link} to reset your password for the Swoulmates App`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        return res.status(400).json({ message: "Error sending email" });
+      } else {
+        return res.status(200).json({ message: "Email Sent" });
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Server error" });
   }
 });
-
-const mailOptions = {
-  from: process.env.EMAIL,
-  to: email,
-  subject: 'Password Reset Request',
-  text: `Click this ${link} to reset your password for the Swoulmates App`,
-};
-
-transport.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      return res.status(400).json({ message: "Error" });
-    } else {
-    return res.status(200).json({ message: "Email Sent" });
-  }
-});
-
 
 //     console.log(error);
 //   } else {
