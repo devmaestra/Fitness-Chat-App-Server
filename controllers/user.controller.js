@@ -37,7 +37,8 @@ router.post('/signup', async (req, res) => {
             userImage: req.body.userImage,
             friends: req.body.friends,
             active: true,
-            admin: false
+            admin: false,
+            userImage: '/assets/User-Profile-PNG-Image.png' // populates a default image asset
         });
 
         const newUser = await user.save();
@@ -316,7 +317,6 @@ router.get('/matches', validateSession, async (req, res) => {
 
     try {
 
-        
         const localRadiusData = await fetchZipData(userZip, radius);
 
         // Ensure that localRadiusData has the expected structure
