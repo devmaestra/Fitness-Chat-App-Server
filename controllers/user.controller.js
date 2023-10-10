@@ -234,6 +234,24 @@ router.delete("/:id", validateSession, async (req, res) => {
   }
 });
 
+//         //3. Use delete method to locate and remove based off ID
+//         const getMyProfile = await User.find({_id: id});
+
+//         //4. Respond to client
+//         deleteUser.deletedCount ?
+//             res.status(200).json({
+//                 message: "User deleted from collection."
+//                 // message: "User " + userName + " deleted from collection." //! To Fix
+//             }) :
+//             res.status(404).json({
+//                 message: 'No such user in collection.'
+//             })
+
+//     } catch (err) {
+//         errorResponse(res, err);
+//     }
+// })
+
 //! Function to Fetch based on Category
 // function fakeStore(endpoint) {  // FakeStore Function
 //     fetch(baseURL + endpoint)
