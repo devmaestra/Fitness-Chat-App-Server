@@ -17,37 +17,41 @@ const errorResponse = (res, error) => {
 };
 
 //TODO SIGNUP
-router.post("/signup", async (req, res) => {
-  try {
-    const user = new User({
-      username: req.body.username,
-      email: req.body.email,
-      password: bcrypt.hashSync(req.body.password, 13),
-      locationZip: req.body.locationZip,
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-      activityBio: req.body.activityBio,
-      bioParagraph: req.body.bioParagraph,
-      userImage: req.body.userImage,
-      friends: req.body.friends,
-      active: true,
-      admin: false,
-      userImage: "/assets/User-Profile-PNG-Image.png", // populates a default image asset
-    });
+router.post('/signup', async (req, res) => {
 
-    const newUser = await user.save();
-    const token = jwt.sign({ id: newUser._id }, SECRET, { expiresIn: "1 day" }); // from Jake's notes
+    try {
 
-    res.status(200).json({
-      user: newUser,
-      message: "Success!",
-      token,
-    });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-    });
-  }
+        const user = new User({
+            username: req.body.username,
+            email: req.body.email,
+            password: bcrypt.hashSync(req.body.password, 13),
+            locationZip: req.body.locationZip,
+            firstName: req.body.firstName,
+            lastName: req.body.lastName,
+            activityBio: req.body.activityBio,
+            bioParagraph: req.body.bioParagraph,
+            userImage: req.body.userImage,
+            friends: req.body.friends,
+            active: true,
+            admin: false,
+            userImage: '/assets/User-Profile-PNG-Image.png' // populates a default image asset
+        });
+
+        const newUser = await user.save();
+        const token = jwt.sign({ id: newUser._id }, SECRET, { expiresIn: "1 day" });  // from Jake's notes
+
+        res.status(200).json({
+            user: newUser,
+            message: 'Success!',
+            token
+        })
+
+
+    } catch (err) {
+        res.status(500).json({
+            error: err.message
+        })
+    }
 });
 
 //TODO LOGIN
@@ -300,21 +304,74 @@ async function fetchZipData(userZip, radius) {
 }
 
 //TODO Get All Matches for logged in user based on Zip Codes:
+router.get('/matches', validateSession, async (req, res) => {
 
-router.get("/matches", validateSession, async (req, res) => {
-  //1. Pull value from User Auth
-  const userId = req.user.id;
-  const userName = req.user.username;
-  const userZip = req.user.locationZip;
-  const radius = 6;
-  // const localRadiusZips = [ 49735, 49700, 49811, 49800, 49810 ];
+    //1. Pull value from User Auth
+    const userId = req.user.id;
+    const userName = req.user.username;
+    const userZip = req.user.locationZip;
+    const radius = 6;
+    // const localRadiusZips = [ 49735, 49700, 49811, 49800, 49810 ];
 
-  try {
-    const localRadiusData = await fetchZipData(userZip, radius);
+    try {
 
-    // Ensure that localRadiusData has the expected structure
-    if (!Array.isArray(localRadiusData.output)) {
-      throw new Error("API response does not have the expected structure.");
+        const localRadiusData = await fetchZipData(userZip, radius);
+
+        // Ensure that localRadiusData has the expected structure
+        if (!Array.isArray(localRadiusData.output)) {
+            throw new Error('API response does not have the expected structure.');
+        }
+
+        const localRadiusZips = localRadiusData.output.map(entry => entry.zip); // extract zip codes
+        const localRadiusCities = localRadiusData.output.map(entry => entry.city); // extract zip codes
+        console.log(localRadiusZips);
+        console.log(localRadiusCities);
+
+        let getMatchByZip = await User.find({ locationZip: { $in: localRadiusZips }, active: true }); // Use ARRAY to find by Zip Code if Active: true.
+        // let getMatchByZip = await User.find({locationZip: userZip, active: true}); // Find by Zip Code if Active: true.
+        const removedSelf = getMatchByZip.filter(user => user.id !== userId);
+
+        getMatchByZip = removedSelf; // Reassign the array of matches, after filtering out SELF.
+
+        const matchNames = getMatchByZip.map(user => user.username); // Extract Names from the Find into a new Array.
+        const matchIds = getMatchByZip.map(user => user.id); // Extract Names from the Find into a new Array.
+
+        const matchData = getMatchByZip.map(user => ({
+            name: user.username,
+            id: user.id
+        }));
+        
+        //FIXME -  let locals = [];
+
+        // for(let i = 0; i <= getMatchByZip.length; i++) {
+        //     let user = await User.find({locationZip: getMatchByZip[i]}).limit(3)
+        //     locals.push(user)
+        // }
+
+        console.log(`Logged in as ${userName}. ID: ${userId} Here are your MATCHES:`);
+        console.log(matchNames);
+        console.log(matchIds);
+        console.log(matchData);
+        console.log(getMatchByZip);
+
+        getMatchByZip ?
+            res.status(200).json({
+                userId,
+                userName,
+                userZip,
+                message:`Logged in as ${userName} (user: ${userId}) in zip ${userZip}. Here are your MATCHES:`,
+                matchNames,
+                matchIds,
+                localRadiusCities,
+                matchData,
+                getMatchByZip
+            }) :
+            res.status(404).json({
+                message: `No zipcode matches found.`
+            });
+
+    } catch (err) {
+        errorResponse(res, err);
     }
 
     const localRadiusZips = localRadiusData.output.map((entry) => entry.zip); // extract zip codes
