@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const SECRET = process.env.JWT;
 const nodemailer = require('nodemailer');
 const config = require('../helpers/config')
-//* UPDATED
+//* UPDATED *
 
 //TODO Validate Session
 const validateSession = require('../middleware/validate-session');
