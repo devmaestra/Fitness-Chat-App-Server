@@ -32,7 +32,7 @@ router.post('/signup', async (req, res) => {
             locationZip: req.body.locationZip,
             firstName: req.body.firstName,
             lastName: req.body.lastName,
-            bioTagline: req.body.bioTagline,
+            activityBio: req.body.activityBio,
             bioParagraph: req.body.bioParagraph,
             userImage: req.body.userImage,
             friends: req.body.friends,
@@ -372,7 +372,7 @@ router.get('/matches', validateSession, async (req, res) => {
             name: user.username,
             id: user.id
         }));
-
+        
         //FIXME -  let locals = [];
 
         // for(let i = 0; i <= getMatchByZip.length; i++) {
@@ -380,7 +380,7 @@ router.get('/matches', validateSession, async (req, res) => {
         //     locals.push(user)
         // }
 
-        console.log(`Logged in as ${userName}. Here are your MATCHES:`);
+        console.log(`Logged in as ${userName}. ID: ${userId} Here are your MATCHES:`);
         console.log(matchNames);
         console.log(matchIds);
         console.log(matchData);
@@ -388,7 +388,10 @@ router.get('/matches', validateSession, async (req, res) => {
 
         getMatchByZip ?
             res.status(200).json({
-                message:`Logged in as ${userName} (user: ${userId}). Here are your MATCHES:`,
+                userId,
+                userName,
+                userZip,
+                message:`Logged in as ${userName} (user: ${userId}) in zip ${userZip}. Here are your MATCHES:`,
                 matchNames,
                 matchIds,
                 localRadiusCities,
