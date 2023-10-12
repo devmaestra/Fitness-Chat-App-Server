@@ -31,9 +31,9 @@ const UserSchema = new mongoose.Schema({
     bioTagline: {
         type: String,
     },
-    bioParagraph : {
+/*     bioParagraph : {
         type: String
-    },
+    }, */
     userImage : {
         type: String //! or and Array of Strings pointing to URLs
     },
