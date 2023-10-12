@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const SECRET = process.env.JWT;
 const nodemailer = require('nodemailer');
 const config = require('../helpers/config')
-
+//* UPDATED *
 
 //TODO Validate Session
 const validateSession = require('../middleware/validate-session');
@@ -32,7 +32,7 @@ router.post('/signup', async (req, res) => {
             locationZip: req.body.locationZip,
             firstName: req.body.firstName,
             lastName: req.body.lastName,
-            bioTagline: req.body.bioTagline,
+            activityBio: req.body.activityBio,
             bioParagraph: req.body.bioParagraph,
             userImage: req.body.userImage,
             friends: req.body.friends,
@@ -255,7 +255,37 @@ router.delete('/:id', validateSession, async (req,res) => {
     }
 })
 
+// //! TODO Get One - GET MY PROFILE by User by ID !!//
+// router.get('/:id', validateSession, async (req,res) => {
 
+//     try {
+
+//         //1. Pull value from parameters
+//         const { id } = req.params;
+
+//         //2. Pull value from User auth
+//         // const userId = req.user.id;
+//         const userName = id.username;
+//         console.log(userName);
+
+
+//         //3. Use delete method to locate and remove based off ID
+//         const getMyProfile = await User.find({_id: id});
+
+//         //4. Respond to client
+//         deleteUser.deletedCount ?
+//             res.status(200).json({
+//                 message: "User deleted from collection."
+//                 // message: "User " + userName + " deleted from collection." //! To Fix
+//             }) :
+//             res.status(404).json({
+//                 message: 'No such user in collection.'
+//             })
+                
+//     } catch (err) {
+//         errorResponse(res, err);
+//     }
+// })
 
 //! Function to Fetch based on Category
 // function fakeStore(endpoint) {  // FakeStore Function
@@ -342,7 +372,7 @@ router.get('/matches', validateSession, async (req, res) => {
             name: user.username,
             id: user.id
         }));
-
+        
         //FIXME -  let locals = [];
 
         // for(let i = 0; i <= getMatchByZip.length; i++) {
@@ -350,7 +380,7 @@ router.get('/matches', validateSession, async (req, res) => {
         //     locals.push(user)
         // }
 
-        console.log(`Logged in as ${userName}. Here are your MATCHES:`);
+        console.log(`Logged in as ${userName}. ID: ${userId} Here are your MATCHES:`);
         console.log(matchNames);
         console.log(matchIds);
         console.log(matchData);
@@ -358,7 +388,10 @@ router.get('/matches', validateSession, async (req, res) => {
 
         getMatchByZip ?
             res.status(200).json({
-                message:`Logged in as ${userName} (user: ${userId}). Here are your MATCHES:`,
+                userId,
+                userName,
+                userZip,
+                message:`Logged in as ${userName} (user: ${userId}) in zip ${userZip}. Here are your MATCHES:`,
                 matchNames,
                 matchIds,
                 localRadiusCities,

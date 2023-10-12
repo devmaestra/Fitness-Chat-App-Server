@@ -73,24 +73,25 @@ router.get('/', validateSession, async(req, res) => {
 });
 
 // //TODO GET ONE CONVERSATION - GET CONVERSATION BY ID
-// router.get('/oneconversation', async (req, res) => {
-//     try {
+router.get('/oneconversation', async (req, res) => {
+    try {
     
-//         const { id } = req.params;
-//         const getConversation = await Conversation.findOne({_id: id});
+        // const { id } = req.params; //! does not work in Postman!
+        const { id } = req.body;
+        const getConversation = await Conversation.findOne({_id: id});
         
-//         getConversation ?
-//             res.status(200).json({
-//                 getConversation
-//             }) :
-//             res.status(404).json({
-//                 messages: 'No conversation by that ID found'
-//             })
+        getConversation ?
+            res.status(200).json({
+                getConversation
+            }) :
+            res.status(404).json({
+                messages: 'No conversation by that ID found'
+            })
 
-//     } catch (err) {
-//         errorResponse(res, err)
-//     }
-// });
+    } catch (err) {
+        errorResponse(res, err)
+    }
+});
 
 //TODO Get All Conversations including logged in user:
 // future devs: keyword here is getAllConversations for FE
