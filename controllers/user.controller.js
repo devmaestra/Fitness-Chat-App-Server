@@ -255,39 +255,35 @@ router.delete('/:id', validateSession, async (req,res) => {
     }
 })
 
-// //! TODO Get One - GET MY PROFILE by User by ID !!//
-// router.get('/:id', validateSession, async (req,res) => {
+// TODO Get One - GET ONE USER by ID
+router.get('/getoneuser/:id', validateSession, async (req,res) => {
 
-//     try {
+    try {
 
-//         //1. Pull value from parameters
-//         const { id } = req.params;
+        //1. Pull value from parameters
+        const { id } = req.params;
 
-//         //2. Pull value from User auth
-//         // const userId = req.user.id;
-//         const userName = id.username;
-//         console.log(userName);
+        console.log(`UserID submitted: ${id}`);
 
+        //2. Use find method to locate based off ID param
+        const getUser = await User.find({_id: id});
+        console.log(getUser);
 
-//         //3. Use delete method to locate and remove based off ID
-//         const getMyProfile = await User.find({_id: id});
+        //4. Respond to client
+        getUser ?
+            res.status(200).json({
+                getUser,
+            }) :
+            res.status(404).json({
+                message: 'No such user in collection.'
+            })
+            
+    } catch (err) {
+        errorResponse(res, err);
+    }
+})
 
-//         //4. Respond to client
-//         deleteUser.deletedCount ?
-//             res.status(200).json({
-//                 message: "User deleted from collection."
-//                 // message: "User " + userName + " deleted from collection." //! To Fix
-//             }) :
-//             res.status(404).json({
-//                 message: 'No such user in collection.'
-//             })
-                
-//     } catch (err) {
-//         errorResponse(res, err);
-//     }
-// })
-
-//! Function to Fetch based on Category
+// ! Function to Fetch based on Category
 // function fakeStore(endpoint) {  // FakeStore Function
 //     fetch(baseURL + endpoint)
 //         .then((res) => res.json())
