@@ -255,39 +255,35 @@ router.delete('/:id', validateSession, async (req,res) => {
     }
 })
 
-// //! TODO Get One - GET MY PROFILE by User by ID !!//
-// router.get('/:id', validateSession, async (req,res) => {
+// TODO Get One - GET ONE USER by ID
+router.get('/getoneuser/:id', validateSession, async (req,res) => {
 
-//     try {
+    try {
 
-//         //1. Pull value from parameters
-//         const { id } = req.params;
+        //1. Pull value from parameters
+        const { id } = req.params;
 
-//         //2. Pull value from User auth
-//         // const userId = req.user.id;
-//         const userName = id.username;
-//         console.log(userName);
+        console.log(`UserID submitted: ${id}`);
 
+        //2. Use find method to locate based off ID param
+        const getUser = await User.find({_id: id});
+        console.log(getUser);
 
-//         //3. Use delete method to locate and remove based off ID
-//         const getMyProfile = await User.find({_id: id});
+        //4. Respond to client
+        getUser ?
+            res.status(200).json({
+                getUser,
+            }) :
+            res.status(404).json({
+                message: 'No such user in collection.'
+            })
+            
+    } catch (err) {
+        errorResponse(res, err);
+    }
+})
 
-//         //4. Respond to client
-//         deleteUser.deletedCount ?
-//             res.status(200).json({
-//                 message: "User deleted from collection."
-//                 // message: "User " + userName + " deleted from collection." //! To Fix
-//             }) :
-//             res.status(404).json({
-//                 message: 'No such user in collection.'
-//             })
-                
-//     } catch (err) {
-//         errorResponse(res, err);
-//     }
-// })
-
-//! Function to Fetch based on Category
+// ! Function to Fetch based on Category
 // function fakeStore(endpoint) {  // FakeStore Function
 //     fetch(baseURL + endpoint)
 //         .then((res) => res.json())
@@ -406,25 +402,6 @@ router.get('/matches', validateSession, async (req, res) => {
         errorResponse(res, err);
     }
 });
-
-//! WORK IN PROGRESS FOR FRONT END GET TARGETUSER BY TARGET_ID
-//! On the frontend, you can make a request to /api/users/:target_Id with the target_Id to retrieve the target user's details, including their username.
-
-//TODO Backend API endpoint to get target user details by target_Id
-// app.get('/api/users/:target_Id', (req, res) => {
-//     const { target_Id } = req.params;
-
-//     // Fetch target user's details from your User model
-//     User.findOne({ _id: target_Id })
-//         .then(targetUser => {
-//             // Respond with the target user's details
-//             res.json(targetUser);
-//         })
-//         .catch(err => {
-//             // Handle errors if user not found, etc.
-//             res.status(500).json({ error: err.message });
-//         });
-// });
 
 
 module.exports = router;
