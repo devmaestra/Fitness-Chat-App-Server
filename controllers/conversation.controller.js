@@ -93,6 +93,30 @@ router.get('/oneconversation', async (req, res) => {
     }
 });
 
+//TODO - // Route to check for an existing conversation between two users
+router.get('/byusers', async (req, res) => {
+    const { user1, user2 } = req.query;
+  
+    try {
+      // Query the Conversation model to find a conversation with the given users
+      const conversation = await Conversation.findOne({
+        users: { $all: [user1, user2] }
+      });
+  
+      if (conversation) {
+        // If a conversation is found, return it
+        return res.json({ conversation });
+      }
+  
+      // If no conversation is found, return null
+      return res.json({ conversation: null });
+    } catch (error) {
+      console.error('Error checking conversation:', error);
+      res.status(500).json({ error: 'Error checking conversation.' });
+    }
+  });
+
+  
 //TODO Get All Conversations including logged in user:
 // future devs: keyword here is getAllConversations for FE
 router.get('/myconversations', validateSession, async(req, res) => {
