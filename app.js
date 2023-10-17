@@ -13,6 +13,7 @@ const uploadURL = require("./s3");
 const user = require("./controllers/user.controller");
 const conversation = require("./controllers/conversation.controller"); //added
 const message = require("./controllers/message.controller");
+const Links = require("./models/links")
 
 // MIDDLEWARE
 const log = console.log;
@@ -34,9 +35,17 @@ app.get("/geturl", async (req, res) => {
   res.status(200).json(url);
 });
 
+app.post("/create", async (req, res) => {
+const { imgURL } = req.body;
+const newEntry = new Links({link: imgURL});
+newEntry.save()
+});
+
+
 app.use("/user", user);
 app.use("/conversation", conversation); //added
 app.use("/message", message); //added
+
 
 // CONNECTION
 

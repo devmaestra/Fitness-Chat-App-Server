@@ -16,7 +16,6 @@ const s3 = new aws.S3 ({
 })
 
 async function uploadURL() {
-    console.log('TESTING')
 const rawBytes = await crypto.randomBytes(16)
 const imgName = rawBytes.toString("hex")
 console.log(imgName)
