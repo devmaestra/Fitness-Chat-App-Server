@@ -27,10 +27,10 @@ router.post('/', validateSession, async (req, res) => {
 
     try {
         //1. Pull data from client (body)
-        const { text } = req.body;
+        // const { text } = req.body;
+        const { text, conversation_Id, target_Id, targetUsername } = req.body;
         const owner_Id = req.user.id;
         const username = req.user.username
-        const { conversation_Id, target_Id, targetUsername } = req.body;
         // const conversation_Id = req.params.conversation_Id;
         
 // After extracting values from req.body //! CONSOLE LOGS
@@ -65,7 +65,7 @@ router.post('/', validateSession, async (req, res) => {
             target_Id: target_Id,
             targetUsername: targetUsername, // Include targetUsername
         };
-        // console.log(`conversationMessage:`, conversationMessage, `.`); //! CONSOLE LOG
+        console.log(`conversationMessage:`, conversationMessage, `.`); //! CONSOLE LOG
         
         try {
             const updatedConversation = await Conversation.findOneAndUpdate(

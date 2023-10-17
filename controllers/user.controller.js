@@ -19,6 +19,13 @@ const errorResponse = (res, error) => {
     )
 }
 
+//TODO Get Logged In User's Data
+// Get the user's data
+router.get('/loggeduser', validateSession, (req, res) => {
+    const user = req.user;
+    res.json(user);
+});
+
 
 //TODO SIGNUP
 router.post('/signup', async (req, res) => {
