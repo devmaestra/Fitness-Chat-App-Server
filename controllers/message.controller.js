@@ -46,7 +46,7 @@ router.post('/', validateSession, async (req, res) => {
         const message = new Message({
             text,
             date: formattedDate, // new Date(),  //! new DATE handling
-            username,
+            // username,
             owner_Id, // declared above
             target_Id,
             targetUsername, // include the targetUsername
@@ -60,7 +60,7 @@ router.post('/', validateSession, async (req, res) => {
             _id: newMessage._id,
             text: newMessage.text,
             date: newMessage.date,
-            username: newMessage.username,
+            // username: newMessage.username,
             owner_Id: newMessage.owner_Id,
             target_Id: target_Id,
             targetUsername: targetUsername, // Include targetUsername
