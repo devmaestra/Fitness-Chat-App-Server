@@ -20,11 +20,26 @@ const errorResponse = (res, error) => {
 }
 
 //TODO Get Logged In User's Data
-// Get the user's data
-router.get('/loggeduser', validateSession, (req, res) => {
-    const user = req.user;
-    res.json(user);
+// Get Logged In User's Data
+router.get('/loggeduser', validateSession, async (req, res) => {
+    try {
+        // Get the user data from the request object (provided by the validateSession middleware)
+        const user = req.user;
+
+        if (!user) {
+            // If user data is not available, return a 404 Not Found response
+            return res.status(404).json({ message: 'User data not found' });
+        }
+
+        // If user data is available, return it as a JSON response
+        res.json(user);
+    } catch (err) {
+        // Handle any errors that occur during the process
+        console.error(err);
+        res.status(500).json({ message: 'Internal server error' });
+    }
 });
+
 
 
 //TODO SIGNUP
@@ -89,146 +104,70 @@ router.post('/login', async (req, res) => {
     }
 })
 
-//! FORGOT PASSWORD & SEND EMAIL//
-
-router.post('/forgot-password', validateSession, async (req, res) => {
-    const { email } = req.body;
-    try {
-      const oldUser = await User.findOne({ email });
-  
-      if (!oldUser) {
-        return res.json({ status: "User Does Not Exist" });
-      }
-  
-      const SECRET = process.env.SECRET; 
-      const secret = SECRET + oldUser.password;
-      const token = jwt.sign({ email: oldUser.email, id: oldUser._id }, secret, { expiresIn: "5m" });
-  
-      const link = `http://localhost:4001/user/reset/${oldUser._id}/${token}`;
-  
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        host: "smtp.gmail.com",
-        port: 465,
-        secure: true,
-        auth: {
-          user: process.env.EMAIL,
-          pass: process.env.EMAIL_PASSWORD,
-        }
-      });
-  
-      const mailOptions = {
-        from: process.env.EMAIL,
-        to: email,
-        subject: 'Password Reset Request',
-        text: `Click this ${link} to reset your password for the Swoulmates App`,
-      };
-  
-      transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-          return res.status(400).json({ message: "Error sending email" });
-        } else {
-          return res.status(200).json({ message: "Email Sent" });
-        }
-      });
-    } catch (error) {
-      return res.status(500).json({ message: "Server error" });
-    }
-  });
-
-//     console.log(error);
-//   } else {
-//     console.log('Email sent: ' + info.response);
-//   }
-// });
-// console.log(link);
-
-//     } catch (error) {}
 // });
 
-router.get('/reset-password/:id/:token', async (req,res) => {
-    const { id, token } = req.params;
-    console.log(req.params);
-    const oldUser = await User.findOne({ _id: id });
-    if(!oldUser){
-        return res.json({ status: "User Does Not Exist" });
-    }
-    const secret = jwt + oldUser.password; //JWT vs. jwt?
+// //TODO PATCH One - Make Updates to User Profile
+// // *** ValidateSession was removed from this endpoint***
+
+// router.patch('/:id/edit', validateSession, async (req, res) => {
+//     try {
+
+//         //1. Pull value from parameter
+//         const { id } = req.params;
+
+//         const filter = { _id: id }
+
+//         //2. Pull data from the body
+//         const info = req.body;
+
+
+//         //3. Use method to locate document based off ID and pass in new info.
+//         const returnOption = { new: true };
+
+
+//         const updated = await User.findOneAndUpdate(filter, info, returnOption);
+//         if (!updated) throw new Error('no.')
+
+//         //4. Respond to client.
+//         res.status(200).json({
+//             message: `Your profile has been updated!`,
+
+//             updated
+//         })
+
+//     } catch (err) {
+//         errorResponse(res, err)
+//     }
+// })
+
+
+//TODO // Define a route to update a user's profile
+router.patch('/:id/edit', validateSession, async (req, res) => {
     try {
-        const verify = jwt.verify(token, secret);
-        // res.send("Verified");
-        res.render("forgot", { email: verify.email, status: "Not Verified"});
-    } catch (error) {
-        res.send("Not Verified");
-    }
-    // res.send("Done"); //remove this later once verified messages come through
-});
-
-router.post('/reset-password/:id/:token', validateSession, async (req,res) => {
-    const { id, token } = req.params;
-    // console.log(req.params); do first
-    const { password } = req.body;
-    const oldUser = await User.findOne({ _id: id });
-    if(!oldUser){
-        return res.json({ status: "User Does Not Exist"});
-    }
-    const secret = jwt + oldUser.password; //JWT vs. jwt?
-    try {
-        const verify = jwt.verify(token, secret);
-        const encryptedPassword = await bcryct.hash(password, 10);
-        await User.updateOne({
-            _id: id,
-        },
-        {
-         $set: {
-            password: encryptedPassword,
-         },
-        }
-        );
-        res.json({ status: "Password Updated" });
-        // res.send("Verified");done first to make sure it is connected
-        res.render("index", { email: verify.email, status:"verified" });
-    } catch (error) {
-        console.log(error);
-        res.json({ status: "Something Went Wrong" });
-    }
-    res.send("Done"); //remove this later once verified messages come through
-});
-
-//TODO PATCH One - Make Updates to User Profile
-// *** ValidateSession was removed from this endpoint***
-
-router.patch('/:id/edit', async (req, res) => {
-    try {
-
-        //1. Pull value from parameter
         const { id } = req.params;
+        const updates = req.body; // The updates to apply
 
-        const filter = { _id: id }
+        // Check if the user exists
+        const user = await User.findById(id);
 
-        //2. Pull data from the body
-        const info = req.body;
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
 
+        // Apply updates
+        Object.keys(updates).forEach((key) => {
+            user[key] = updates[key];
+        });
 
-        //3. Use method to locate document based off ID and pass in new info.
-        const returnOption = { new: true };
+        // Save the updated user
+        const updatedUser = await user.save();
 
-
-        const updated = await User.findOneAndUpdate(filter, info, returnOption);
-        if (!updated) throw new Error('no.')
-
-        //4. Respond to client.
-        res.status(200).json({
-            message: `Your profile has been updated!`,
-
-            updated
-        })
-
+        res.status(200).json({ message: 'Profile updated', user: updatedUser });
     } catch (err) {
-        errorResponse(res, err)
+        console.error(err);
+        res.status(500).json({ message: 'Internal server error' });
     }
-})
-
+});
 
 //TODO DELETE One - Delete User by ID
 router.delete('/:id', validateSession, async (req,res) => {
