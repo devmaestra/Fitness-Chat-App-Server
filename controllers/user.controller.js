@@ -18,12 +18,37 @@ const errorResponse = (res, error) => {
 };
 
 //TODO Get Logged In User's Data
+<<<<<<< HEAD
 // Get the user's data
 router.get("/loggeduser", validateSession, (req, res) => {
   const user = req.user;
   res.json(user);
 });
 
+=======
+// Get Logged In User's Data
+router.get('/loggeduser', validateSession, async (req, res) => {
+    try {
+        // Get the user data from the request object (provided by the validateSession middleware)
+        const user = req.user;
+
+        if (!user) {
+            // If user data is not available, return a 404 Not Found response
+            return res.status(404).json({ message: 'User data not found' });
+        }
+
+        // If user data is available, return it as a JSON response
+        res.json(user);
+    } catch (err) {
+        // Handle any errors that occur during the process
+        console.error(err);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
+
+>>>>>>> 894627eb98f043c41d026c44065f2fe793a018f8
 //TODO SIGNUP
 router.post("/signup", async (req, res) => {
   try {
@@ -93,6 +118,7 @@ router.post("/forgot-password", validateSession, async (req, res) => {
       return res.json({ status: "User Does Not Exist" });
     }
 
+<<<<<<< HEAD
     const SECRET = process.env.SECRET;
     const secret = SECRET + oldUser.password;
     const token = jwt.sign({ email: oldUser.email, id: oldUser._id }, secret, {
@@ -130,17 +156,20 @@ router.post("/forgot-password", validateSession, async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 });
-
-//     console.log(error);
-//   } else {
-//     console.log('Email sent: ' + info.response);
-//   }
-// });
-// console.log(link);
-
-//     } catch (error) {}
+=======
 // });
 
+// //TODO PATCH One - Make Updates to User Profile
+// // *** ValidateSession was removed from this endpoint***
+>>>>>>> 894627eb98f043c41d026c44065f2fe793a018f8
+
+// router.patch('/:id/edit', validateSession, async (req, res) => {
+//     try {
+
+//         //1. Pull value from parameter
+//         const { id } = req.params;
+
+<<<<<<< HEAD
 router.get("/reset-password/:id/:token", async (req, res) => {
   const { id, token } = req.params;
   console.log(req.params);
@@ -190,10 +219,15 @@ router.post("/reset-password/:id/:token", validateSession, async (req, res) => {
   }
   res.send("Done"); //remove this later once verified messages come through
 });
+=======
+//         const filter = { _id: id }
 
-//TODO PATCH One - Make Updates to User Profile
-// *** ValidateSession was removed from this endpoint***
+//         //2. Pull data from the body
+//         const info = req.body;
+>>>>>>> 894627eb98f043c41d026c44065f2fe793a018f8
 
+
+<<<<<<< HEAD
 router.patch("/:id/edit", async (req, res) => {
   try {
     //1. Pull value from parameter
@@ -203,10 +237,31 @@ router.patch("/:id/edit", async (req, res) => {
 
     //2. Pull data from the body
     const info = req.body;
+=======
+//         //3. Use method to locate document based off ID and pass in new info.
+//         const returnOption = { new: true };
+
+
+//         const updated = await User.findOneAndUpdate(filter, info, returnOption);
+//         if (!updated) throw new Error('no.')
+
+//         //4. Respond to client.
+//         res.status(200).json({
+//             message: `Your profile has been updated!`,
+
+//             updated
+//         })
+
+//     } catch (err) {
+//         errorResponse(res, err)
+//     }
+// })
+>>>>>>> 894627eb98f043c41d026c44065f2fe793a018f8
 
     //3. Use method to locate document based off ID and pass in new info.
     const returnOption = { new: true };
 
+<<<<<<< HEAD
     const updated = await User.findOneAndUpdate(filter, info, returnOption);
     if (!updated) throw new Error("no.");
 
@@ -256,6 +311,35 @@ router.get("/getoneuser/:id", validateSession, async (req, res) => {
     const { id } = req.params;
 
     console.log(`UserID submitted: ${id}`);
+=======
+//TODO // Define a route to update a user's profile
+router.patch('/:id/edit', validateSession, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updates = req.body; // The updates to apply
+
+        // Check if the user exists
+        const user = await User.findById(id);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Apply updates
+        Object.keys(updates).forEach((key) => {
+            user[key] = updates[key];
+        });
+
+        // Save the updated user
+        const updatedUser = await user.save();
+
+        res.status(200).json({ message: 'Profile updated', user: updatedUser });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+>>>>>>> 894627eb98f043c41d026c44065f2fe793a018f8
 
     //2. Use find method to locate based off ID param
     const getUser = await User.find({ _id: id });
