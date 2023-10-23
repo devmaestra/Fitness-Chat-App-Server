@@ -18,14 +18,6 @@ const errorResponse = (res, error) => {
 };
 
 //TODO Get Logged In User's Data
-<<<<<<< HEAD
-// Get the user's data
-router.get("/loggeduser", validateSession, (req, res) => {
-  const user = req.user;
-  res.json(user);
-});
-
-=======
 // Get Logged In User's Data
 router.get('/loggeduser', validateSession, async (req, res) => {
     try {
@@ -48,7 +40,6 @@ router.get('/loggeduser', validateSession, async (req, res) => {
 
 
 
->>>>>>> 894627eb98f043c41d026c44065f2fe793a018f8
 //TODO SIGNUP
 router.post("/signup", async (req, res) => {
   try {
@@ -118,50 +109,10 @@ router.post("/forgot-password", validateSession, async (req, res) => {
       return res.json({ status: "User Does Not Exist" });
     }
 
-<<<<<<< HEAD
-    const SECRET = process.env.SECRET;
-    const secret = SECRET + oldUser.password;
-    const token = jwt.sign({ email: oldUser.email, id: oldUser._id }, secret, {
-      expiresIn: "5m",
-    });
-
-    const link = `http://localhost:4001/user/reset/${oldUser._id}/${token}`;
-
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true,
-      auth: {
-        user: process.env.EMAIL,
-        pass: process.env.EMAIL_PASSWORD,
-      },
-    });
-
-    const mailOptions = {
-      from: process.env.EMAIL,
-      to: email,
-      subject: "Password Reset Request",
-      text: `Click this ${link} to reset your password for the Swoulmates App`,
-    };
-
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        return res.status(400).json({ message: "Error sending email" });
-      } else {
-        return res.status(200).json({ message: "Email Sent" });
-      }
-    });
-  } catch (error) {
-    return res.status(500).json({ message: "Server error" });
-  }
-});
-=======
 // });
 
 // //TODO PATCH One - Make Updates to User Profile
 // // *** ValidateSession was removed from this endpoint***
->>>>>>> 894627eb98f043c41d026c44065f2fe793a018f8
 
 // router.patch('/:id/edit', validateSession, async (req, res) => {
 //     try {
@@ -169,62 +120,10 @@ router.post("/forgot-password", validateSession, async (req, res) => {
 //         //1. Pull value from parameter
 //         const { id } = req.params;
 
-<<<<<<< HEAD
-router.get("/reset-password/:id/:token", async (req, res) => {
-  const { id, token } = req.params;
-  console.log(req.params);
-  const oldUser = await User.findOne({ _id: id });
-  if (!oldUser) {
-    return res.json({ status: "User Does Not Exist" });
-  }
-  const secret = jwt + oldUser.password; //JWT vs. jwt?
-  try {
-    const verify = jwt.verify(token, secret);
-    // res.send("Verified");
-    res.render("forgot", { email: verify.email, status: "Not Verified" });
-  } catch (error) {
-    res.send("Not Verified");
-  }
-  // res.send("Done"); //remove this later once verified messages come through
-});
-
-router.post("/reset-password/:id/:token", validateSession, async (req, res) => {
-  const { id, token } = req.params;
-  // console.log(req.params); do first
-  const { password } = req.body;
-  const oldUser = await User.findOne({ _id: id });
-  if (!oldUser) {
-    return res.json({ status: "User Does Not Exist" });
-  }
-  const secret = jwt + oldUser.password; //JWT vs. jwt?
-  try {
-    const verify = jwt.verify(token, secret);
-    const encryptedPassword = await bcryct.hash(password, 10);
-    await User.updateOne(
-      {
-        _id: id,
-      },
-      {
-        $set: {
-          password: encryptedPassword,
-        },
-      }
-    );
-    res.json({ status: "Password Updated" });
-    // res.send("Verified");done first to make sure it is connected
-    res.render("index", { email: verify.email, status: "verified" });
-  } catch (error) {
-    console.log(error);
-    res.json({ status: "Something Went Wrong" });
-  }
-  res.send("Done"); //remove this later once verified messages come through
-});
-=======
 //         const filter = { _id: id }
 
 //         //2. Pull data from the body
 //         const info = req.body;
->>>>>>> 894627eb98f043c41d026c44065f2fe793a018f8
 
 
 <<<<<<< HEAD
@@ -237,7 +136,7 @@ router.patch("/:id/edit", async (req, res) => {
 
     //2. Pull data from the body
     const info = req.body;
-=======
+
 //         //3. Use method to locate document based off ID and pass in new info.
 //         const returnOption = { new: true };
 
@@ -256,7 +155,7 @@ router.patch("/:id/edit", async (req, res) => {
 //         errorResponse(res, err)
 //     }
 // })
->>>>>>> 894627eb98f043c41d026c44065f2fe793a018f8
+
 
     //3. Use method to locate document based off ID and pass in new info.
     const returnOption = { new: true };
